@@ -1,11 +1,11 @@
-const express = require("express");
 const { Polly } = require("@aws-sdk/client-polly");
+const express = require("express");
 const bodyParser = require("body-parser");
 const cors = require("cors");
+const serverless = require("serverless-http");
 require("dotenv").config();
 
 const app = express();
-const port = 5000;
 
 // Create an Amazon Polly service client object.
 const polly = new Polly({
@@ -53,6 +53,5 @@ app.post("/synthesize", async (req, res) => {
   }
 });
 
-app.listen(port, () => {
-  console.log(`Server running on port ${port}`);
-});
+module.exports = app;
+module.exports.handler = serverless(app);
