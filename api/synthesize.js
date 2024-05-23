@@ -7,6 +7,11 @@ require("dotenv").config();
 
 const app = express();
 
+// Enable CORS
+app.use(cors({ origin: true }));
+
+app.use(bodyParser.json());
+
 // Create an Amazon Polly service client object.
 const polly = new Polly({
   region: process.env.AWS_REGION,
@@ -16,10 +21,7 @@ const polly = new Polly({
   },
 });
 
-app.use(cors());
-app.use(bodyParser.json());
-
-app.post("/synthesize", async (req, res) => {
+app.post("/api/synthesize", async (req, res) => {
   const { text, voiceId = "Joanna" } = req.body;
 
   const params = {
@@ -30,6 +32,9 @@ app.post("/synthesize", async (req, res) => {
 
   try {
     const data = await polly.synthesizeSpeech(params);
+    if (!data.AudioStream) {
+      throw new Error("No audio stream received from Polly");
+    }
 
     let audioBuffer = [];
 
